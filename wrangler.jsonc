@@ -1,9 +1,15 @@
 {
-  "name": "residence-seven",
+  "name": "site-residence-seven",
   "main": "worker.js",
   "compatibility_date": "2026-07-01",
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
-  }
+  },
+  "kv_namespaces": [
+    {
+      "binding": "CONTENT_KV",
+      "id": "e336e94a997143c09a05842639c3b90b"
+    }
+  ]
 }

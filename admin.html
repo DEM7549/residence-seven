@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Résidence Seven</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Work+Sans:wght@300;400;500;600&family=Space+Mono&display=swap');
+
+:root{
+  --ink:#0F2A28; --ink-soft:#17403C; --brass:#B08D57; --brass-light:#D3B78A;
+  --sand:#EDE6D8; --paper:#FAF7F2; --line:rgba(15,42,40,0.14);
+  --danger:#B5482F; --ok:#3F7A5C;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Work Sans',sans-serif;line-height:1.5;padding-bottom:120px;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:500;}
+.mono{font-family:'Space Mono',monospace;}
+
+/* Login gate */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);}
+.gate-box{background:var(--paper);padding:44px;width:340px;max-width:90vw;}
+.gate-box h1{font-size:1.4rem;margin-bottom:8px;}
+.gate-box p{font-size:0.85rem;opacity:0.65;margin-bottom:22px;}
+.gate-box input{width:100%;padding:12px;border:1px solid var(--line);font-family:inherit;font-size:0.95rem;margin-bottom:14px;}
+.gate-box button{width:100%;padding:13px;background:var(--brass);border:none;color:var(--ink);font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;}
+.gate-box button:hover{background:var(--brass-light);}
+.gate-err{color:var(--danger);font-size:0.8rem;margin-top:10px;display:none;}
+
+/* Admin shell */
+#app{display:none;}
+header.top{position:sticky;top:0;z-index:50;background:var(--ink);color:var(--paper);padding:18px 32px;display:flex;justify-content:space-between;align-items:center;}
+header.top .brand{font-family:'Fraunces',serif;font-size:1.1rem;}
+header.top .actions{display:flex;gap:12px;align-items:center;}
+.btn{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;border:none;cursor:pointer;transition:opacity .2s ease;}
+.btn-save{background:var(--brass);color:var(--ink);}
+.btn-save:hover{opacity:0.85;}
+.btn-outline{background:transparent;color:var(--paper);border:1px solid rgba(250,247,242,0.35);}
+.btn-outline:hover{border-color:var(--paper);}
+.status{font-family:'Space Mono',monospace;font-size:0.7rem;opacity:0.8;}
+.status.ok{color:#9FD9BC;}
+.status.err{color:#F0A98F;}
+
+.container{max-width:920px;margin:0 auto;padding:40px 24px;}
+.panel{background:#fff;border:1px solid var(--line);margin-bottom:28px;}
+.panel-head{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+.panel-head h2{font-size:1.15rem;}
+.panel-body{padding:24px;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:'Space Mono',monospace;font-size:0.66rem;letter-spacing:0.06em;text-transform:uppercase;opacity:0.6;margin-bottom:6px;}
+.field input, .field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);font-family:'Work Sans',sans-serif;font-size:0.92rem;background:var(--paper);}
+.field textarea{resize:vertical;min-height:60px;}
+.field input:focus, .field textarea:focus{outline:2px solid var(--brass);outline-offset:1px;background:#fff;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media (max-width:700px){.row2,.row4{grid-template-columns:1fr;}}
+
+.item-card{border:1px solid var(--line);padding:18px;margin-bottom:14px;background:var(--paper);position:relative;}
+.item-card .item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.item-card .item-top span{font-family:'Space Mono',monospace;font-size:0.7rem;opacity:0.55;}
+.btn-del{background:transparent;border:1px solid var(--danger);color:var(--danger);font-family:'Space Mono',monospace;font-size:0.65rem;text-transform:uppercase;padding:6px 10px;cursor:pointer;}
+.btn-del:hover{background:var(--danger);color:#fff;}
+.btn-add{background:transparent;border:1px dashed var(--ink);color:var(--ink);font-family:'Space Mono',monospace;font-size:0.72rem;text-transform:uppercase;padding:12px;width:100%;cursor:pointer;letter-spacing:0.05em;}
+.btn-add:hover{background:var(--sand);}
+
+.hint{font-size:0.78rem;opacity:0.55;margin-top:-8px;margin-bottom:16px;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <h1>Administration</h1>
+    <p>Résidence Seven — entrez le mot de passe pour modifier le site.</p>
+    <input type="password" id="pwInput" placeholder="Mot de passe">
+    <button id="pwSubmit">Entrer</button>
+    <p class="gate-err" id="gateErr">Impossible de charger le contenu. Vérifiez l'API.</p>
+  </div>
+</div>
+
+<div id="app">
+  <header class="top">
+    <div class="brand">⚙ Résidence Seven — Admin</div>
+    <div class="actions">
+      <span class="status" id="saveStatus"></span>
+      <button class="btn btn-outline" onclick="window.open('/','_blank')">Voir le site</button>
+      <button class="btn btn-save" id="saveBtn">Enregistrer</button>
+    </div>
+  </header>
+
+  <div class="container" id="formRoot"></div>
+</div>
+
+<script>
+window.__FALLBACK__ = {"hero": {"eyebrow": "Résidence Seven — Cocody, Abidjan", "titleLine1": "Sept étages,", "titleEm": "une seule", "titleLine2": "adresse.", "subtitle": "Une résidence-hôtel discrète sur la lagune, pensée pour les séjours qui s'installent — une nuit, une semaine, une saison.", "stats": [{"label": "Ouvert", "value": "Toute l'année"}, {"label": "Suites", "value": "24 appartements"}, {"label": "Vue", "value": "Lagune Ébrié"}, {"label": "Arrivée", "value": "Dès 14h00"}]}, "philosophy": {"sectionTitle": "La maison", "sectionText": "Le chiffre sept donne son nom à la résidence — sept niveaux, sept lignes de conduite, une seule adresse à retenir.", "lead": "Résidence Seven n'est ni tout à fait un hôtel, ni tout à fait un appartement. C'est un <em>entre-deux</em> pensé pour les gens qui restent : le confort d'un chez-soi, la discrétion d'un service qui ne s'impose jamais.", "items": [{"code": "01", "title": "Séjours sans minimum imposé", "text": "Une nuit ou trois mois : le tarif s'ajuste, pas l'accueil."}, {"code": "02", "title": "Cuisine équipée dans chaque suite", "text": "Pour cuisiner un vrai repas, pas réchauffer un plat."}, {"code": "03", "title": "Personnel présent, jamais insistant", "text": "Un numéro direct, une réponse en quelques minutes, aucune sollicitation."}]}, "suites": [{"tag": "Studio", "name": "Le Comptoir", "meta": "28 m² · 1 personne", "desc": "Un espace compact et bien pensé, coin cuisine ouvert et bureau face à la lumière du matin.", "price": "55 000 F"}, {"tag": "Suite", "name": "La Lagune", "meta": "42 m² · 2 personnes", "desc": "Chambre séparée et balcon filant, vue directe sur l'eau, idéale pour les séjours d'une semaine.", "price": "85 000 F"}, {"tag": "Appartement", "name": "Le Sept", "meta": "68 m² · 4 personnes", "desc": "Deux chambres, salon traversant et terrasse privée au dernier étage. Notre adresse la plus demandée.", "price": "140 000 F"}], "gallery": [{"img": "", "seed": "seven-salon", "cap": "Le Sept — salon", "class": "wide tall"}, {"img": "", "seed": "seven-chambre", "cap": "La Lagune — chambre", "class": ""}, {"img": "", "seed": "seven-piscine", "cap": "Toit-terrasse", "class": ""}, {"img": "", "seed": "seven-cuisine", "cap": "Le Comptoir — cuisine", "class": "tall"}, {"img": "", "seed": "seven-accueil", "cap": "Réception", "class": "wide"}, {"img": "", "seed": "seven-vue", "cap": "Vue lagune", "class": ""}, {"img": "", "seed": "seven-bain", "cap": "Salle de bain", "class": ""}], "amenities": [{"icon": "◐", "title": "Ménage sur demande", "text": "Quotidien ou hebdomadaire, selon la durée de votre séjour."}, {"icon": "▤", "title": "Bureau & wifi fibre", "text": "Connexion stable dans chaque suite, coin bureau dédié."}, {"icon": "✦", "title": "Toit-terrasse", "text": "Piscine à débordement et vue sur la lagune, ouvert dès 6h."}, {"icon": "⚿", "title": "Accueil 24h/24", "text": "Arrivée tardive ou départ matinal, sans frais supplémentaire."}, {"icon": "⌘", "title": "Parking sécurisé", "text": "Une place réservée par suite, gardiennage permanent."}, {"icon": "♨", "title": "Blanchisserie", "text": "Collecte le matin, linge rendu le soir même."}, {"icon": "✂", "title": "Épicerie de courtoisie", "text": "Essentiels du petit-déjeuner disponibles à toute heure."}, {"icon": "➤", "title": "Navette aéroport", "text": "Transfert privé sur réservation, 35 minutes de l'aéroport FHB."}], "location": {"address": "Boulevard de la Corniche", "addressSub": "Cocody, Abidjan, Côte d'Ivoire", "phone": "+225 27 22 48 XX XX", "phoneSub": "Accueil disponible 24h/24", "email": "sejour@residence-seven.ci", "emailSub": "Réponse sous 24h ouvrées", "access": "10 min du Plateau", "accessSub": "35 min de l'aéroport Félix-Houphouët-Boigny"}, "booking": {"titleLine1": "Prêt pour votre", "titleEm": "séjour", "titleLine2": "?", "text": "Indiquez vos dates, nous confirmons la disponibilité et revenons vers vous sous peu — sans passer par un intermédiaire."}, "footer": {"desc": "Une résidence-hôtel sur la lagune Ébrié, à Cocody. Sept étages, un même souci du détail à chaque niveau.", "phone": "+225 27 22 48 XX XX", "email": "sejour@residence-seven.ci", "address": "Cocody, Abidjan"}};
+const API = '/api/content';
+let password = '';
+let state = null;
+
+// ---------- Login ----------
+document.getElementById('pwSubmit').addEventListener('click', login);
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key === 'Enter') login(); });
+
+async function login(){
+  password = document.getElementById('pwInput').value;
+  const err = document.getElementById('gateErr');
+  err.style.display = 'none';
+  try{
+    const res = await fetch(API, { cache: 'no-store' });
+    if(res.ok){
+      state = await res.json();
+    }
+  }catch(e){}
+  if(!state){
+    err.textContent = "Aucun contenu trouvé côté serveur (l'API ou le KV ne sont peut-être pas encore configurés). Vous pouvez quand même continuer : la sauvegarde créera le contenu.";
+    err.style.display = 'block';
+    state = window.__FALLBACK__;
+  }
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  buildForm();
+}
+
+// ---------- Path helpers ----------
+function getPath(obj, path){
+  return path.split('.').reduce((o,k) => (o == null ? o : o[k]), obj);
+}
+function setPath(obj, path, value){
+  const keys = path.split('.');
+  let cur = obj;
+  for(let i=0;i<keys.length-1;i++) cur = cur[keys[i]];
+  cur[keys[keys.length-1]] = value;
+}
+
+// ---------- Form builder ----------
+function field(label, path, multiline){
+  const val = getPath(state, path) ?? '';
+  return `<div class="field"><label>${label}</label>${fieldTag(path, val, multiline)}</div>`;
+}
+function fieldTag(path, val, multiline){
+  if(multiline){
+    return `<textarea data-path="${path}" oninput="onFieldInput(this)">${val ?? ''}</textarea>`;
+  }
+  return `<input data-path="${path}" value="${escapeAttr(val ?? '')}" oninput="onFieldInput(this)">`;
+}
+function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
+
+function onFieldInput(el){
+  setPath(state, el.dataset.path, el.value);
+}
+
+function panel(title, bodyHtml){
+  return `<div class="panel"><div class="panel-head"><h2>${title}</h2></div><div class="panel-body">${bodyHtml}</div></div>`;
+}
+
+function buildForm(){
+  const root = document.getElementById('formRoot');
+  root.innerHTML =
+    panel('Hero — première impression', `
+      ${field('Texte au-dessus du titre', 'hero.eyebrow')}
+      <div class="row2">
+        ${field('Titre — ligne 1', 'hero.titleLine1')}
+        ${field('Titre — mot en italique', 'hero.titleEm')}
+      </div>
+      ${field('Titre — fin de ligne', 'hero.titleLine2')}
+      ${field('Sous-titre', 'hero.subtitle', true)}
+      <div class="field"><label>Chiffres clés (bandeau du bas)</label></div>
+      <div id="statsList"></div>
+      <button type="button" class="btn-add" onclick="addItem('hero.stats', {label:'Nouveau', value:'Valeur'})">+ Ajouter un chiffre clé</button>
+    `) +
+    panel('La maison — philosophie', `
+      ${field('Titre de section', 'philosophy.sectionTitle')}
+      ${field('Texte de section', 'philosophy.sectionText', true)}
+      ${field("Paragraphe d'intro (le mot entre &lt;em&gt;&lt;/em&gt; sera en italique)", 'philosophy.lead', true)}
+      <div class="field"><label>Points clés</label></div>
+      <div id="philoItemsList"></div>
+      <button type="button" class="btn-add" onclick="addItem('philosophy.items', {code:'0'+ (state.philosophy.items.length+1), title:'Nouveau point', text:'Description.'})">+ Ajouter un point</button>
+    `) +
+    panel('Suites', `<div id="suitesList"></div>
+      <button type="button" class="btn-add" onclick="addItem('suites', {tag:'Suite', name:'Nouvelle suite', meta:'0 m² · 0 personne', desc:'Description.', price:'0 F'})">+ Ajouter une suite</button>
+    `) +
+    panel('Galerie photo', `<p class="hint">Laissez "URL de l'image" vide pour utiliser une image de démonstration générée automatiquement.</p>
+      <div id="galleryList"></div>
+      <button type="button" class="btn-add" onclick="addItem('gallery', {img:'', seed:'seven-'+Date.now(), cap:'Nouvelle photo', class:''})">+ Ajouter une photo</button>
+    `) +
+    panel('Services de la maison', `<div id="amenitiesList"></div>
+      <button type="button" class="btn-add" onclick="addItem('amenities', {icon:'✦', title:'Nouveau service', text:'Description.'})">+ Ajouter un service</button>
+    `) +
+    panel('Adresse & contact', `
+      <div class="row2">
+        ${field('Adresse', 'location.address')}
+        ${field('Complément adresse', 'location.addressSub')}
+      </div>
+      <div class="row2">
+        ${field('Téléphone', 'location.phone')}
+        ${field('Complément téléphone', 'location.phoneSub')}
+      </div>
+      <div class="row2">
+        ${field('Courriel', 'location.email')}
+        ${field('Complément courriel', 'location.emailSub')}
+      </div>
+      <div class="row2">
+        ${field('Accès', 'location.access')}
+        ${field('Complément accès', 'location.accessSub')}
+      </div>
+    `) +
+    panel('Bloc réservation', `
+      <div class="row2">
+        ${field('Titre — ligne 1', 'booking.titleLine1')}
+        ${field('Titre — mot en italique', 'booking.titleEm')}
+      </div>
+      ${field('Titre — fin', 'booking.titleLine2')}
+      ${field('Texte', 'booking.text', true)}
+    `) +
+    panel('Pied de page', `
+      ${field('Description', 'footer.desc', true)}
+      <div class="row2">
+        ${field('Téléphone', 'footer.phone')}
+        ${field('Courriel', 'footer.email')}
+      </div>
+      ${field('Adresse courte', 'footer.address')}
+    `);
+
+  renderList('statsList', 'hero.stats', (item, path) => `
+    <div class="row2">
+      ${fieldRaw('Libellé', path + '.label', item.label)}
+      ${fieldRaw('Valeur', path + '.value', item.value)}
+    </div>`);
+
+  renderList('philoItemsList', 'philosophy.items', (item, path) => `
+    <div class="row2">
+      ${fieldRaw('Code', path + '.code', item.code)}
+      ${fieldRaw('Titre', path + '.title', item.title)}
+    </div>
+    ${fieldRaw('Texte', path + '.text', item.text, true)}`);
+
+  renderList('suitesList', 'suites', (item, path) => `
+    <div class="row2">
+      ${fieldRaw('Catégorie (Studio / Suite / Appartement)', path + '.tag', item.tag)}
+      ${fieldRaw('Nom', path + '.name', item.name)}
+    </div>
+    <div class="row2">
+      ${fieldRaw('Détails (surface, capacité)', path + '.meta', item.meta)}
+      ${fieldRaw('Prix affiché', path + '.price', item.price)}
+    </div>
+    ${fieldRaw('Description', path + '.desc', item.desc, true)}`);
+
+  renderList('galleryList', 'gallery', (item, path) => `
+    <div class="row2">
+      ${fieldRaw('Légende', path + '.cap', item.cap)}
+      ${fieldRaw("URL de l'image (optionnel)", path + '.img', item.img)}
+    </div>`);
+
+  renderList('amenitiesList', 'amenities', (item, path) => `
+    <div class="row2">
+      ${fieldRaw('Icône (un caractère/symbole)', path + '.icon', item.icon)}
+      ${fieldRaw('Titre', path + '.title', item.title)}
+    </div>
+    ${fieldRaw('Texte', path + '.text', item.text, true)}`);
+}
+
+function fieldRaw(label, path, val, multiline){
+  const tag = multiline ? 'textarea' : 'input';
+  const valueAttr = multiline ? '' : ` value="${escapeAttr(val ?? '')}"`;
+  const inner = multiline ? (val ?? '') : '';
+  return `<div class="field"><label>${label}</label><${tag} data-path="${path}"${valueAttr} oninput="onFieldInput(this)">${inner}</${tag}></div>`;
+}
+
+function renderList(containerId, arrayPath, rowTemplate){
+  const container = document.getElementById(containerId);
+  const arr = getPath(state, arrayPath) || [];
+  container.innerHTML = arr.map((item, i) => {
+    const path = `${arrayPath}.${i}`;
+    return `<div class="item-card">
+      <div class="item-top">
+        <span>#${i + 1}</span>
+        <button type="button" class="btn-del" onclick="removeItem('${arrayPath}', ${i})">Supprimer</button>
+      </div>
+      ${rowTemplate(item, path)}
+    </div>`;
+  }).join('');
+}
+
+function addItem(arrayPath, template){
+  const arr = getPath(state, arrayPath);
+  arr.push(template);
+  buildForm();
+}
+function removeItem(arrayPath, index){
+  const arr = getPath(state, arrayPath);
+  arr.splice(index, 1);
+  buildForm();
+}
+
+// ---------- Save ----------
+document.getElementById('saveBtn').addEventListener('click', save);
+async function save(){
+  const statusEl = document.getElementById('saveStatus');
+  statusEl.textContent = 'Enregistrement…';
+  statusEl.className = 'status';
+  try{
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + password
+      },
+      body: JSON.stringify(state)
+    });
+    if(res.ok){
+      statusEl.textContent = 'Enregistré ✓';
+      statusEl.className = 'status ok';
+    } else {
+      const body = await res.json().catch(() => ({}));
+      statusEl.textContent = res.status === 401
+        ? 'Mot de passe incorrect'
+        : ('Erreur : ' + (body.error || res.status));
+      statusEl.className = 'status err';
+    }
+  }catch(e){
+    statusEl.textContent = 'Erreur réseau';
+    statusEl.className = 'status err';
+  }
+}
+</script>
+</body>
+</html>

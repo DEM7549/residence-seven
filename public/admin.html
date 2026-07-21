@@ -65,6 +65,13 @@ header.top .actions{display:flex;gap:12px;align-items:center;}
 .btn-add:hover{background:var(--sand);}
 
 .hint{font-size:0.78rem;opacity:0.55;margin-top:-8px;margin-bottom:16px;}
+
+.gal-preview-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+.gal-thumb{width:72px;height:72px;object-fit:cover;border:1px solid var(--line);background:var(--sand);flex-shrink:0;}
+.gal-upload{display:flex;flex-direction:column;gap:4px;}
+.btn-upload{display:inline-block;background:var(--ink);color:var(--paper);font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;padding:9px 14px;cursor:pointer;width:fit-content;}
+.btn-upload:hover{opacity:0.85;}
+.upload-hint{font-size:0.72rem;opacity:0.5;}
 </style>
 </head>
 <body>
@@ -93,7 +100,7 @@ header.top .actions{display:flex;gap:12px;align-items:center;}
 </div>
 
 <script>
-window.__FALLBACK__ = {"hero": {"eyebrow": "Résidence Seven — Cocody, Abidjan", "titleLine1": "Sept étages,", "titleEm": "une seule", "titleLine2": "adresse.", "subtitle": "Une résidence-hôtel discrète sur la lagune, pensée pour les séjours qui s'installent — une nuit, une semaine, une saison.", "stats": [{"label": "Ouvert", "value": "Toute l'année"}, {"label": "Suites", "value": "24 appartements"}, {"label": "Vue", "value": "Lagune Ébrié"}, {"label": "Arrivée", "value": "Dès 14h00"}]}, "philosophy": {"sectionTitle": "La maison", "sectionText": "Le chiffre sept donne son nom à la résidence — sept niveaux, sept lignes de conduite, une seule adresse à retenir.", "lead": "Résidence Seven n'est ni tout à fait un hôtel, ni tout à fait un appartement. C'est un <em>entre-deux</em> pensé pour les gens qui restent : le confort d'un chez-soi, la discrétion d'un service qui ne s'impose jamais.", "items": [{"code": "01", "title": "Séjours sans minimum imposé", "text": "Une nuit ou trois mois : le tarif s'ajuste, pas l'accueil."}, {"code": "02", "title": "Cuisine équipée dans chaque suite", "text": "Pour cuisiner un vrai repas, pas réchauffer un plat."}, {"code": "03", "title": "Personnel présent, jamais insistant", "text": "Un numéro direct, une réponse en quelques minutes, aucune sollicitation."}]}, "suites": [{"tag": "Studio", "name": "Le Comptoir", "meta": "28 m² · 1 personne", "desc": "Un espace compact et bien pensé, coin cuisine ouvert et bureau face à la lumière du matin.", "price": "55 000 F"}, {"tag": "Suite", "name": "La Lagune", "meta": "42 m² · 2 personnes", "desc": "Chambre séparée et balcon filant, vue directe sur l'eau, idéale pour les séjours d'une semaine.", "price": "85 000 F"}, {"tag": "Appartement", "name": "Le Sept", "meta": "68 m² · 4 personnes", "desc": "Deux chambres, salon traversant et terrasse privée au dernier étage. Notre adresse la plus demandée.", "price": "140 000 F"}], "gallery": [{"img": "", "seed": "seven-salon", "cap": "Le Sept — salon", "class": "wide tall"}, {"img": "", "seed": "seven-chambre", "cap": "La Lagune — chambre", "class": ""}, {"img": "", "seed": "seven-piscine", "cap": "Toit-terrasse", "class": ""}, {"img": "", "seed": "seven-cuisine", "cap": "Le Comptoir — cuisine", "class": "tall"}, {"img": "", "seed": "seven-accueil", "cap": "Réception", "class": "wide"}, {"img": "", "seed": "seven-vue", "cap": "Vue lagune", "class": ""}, {"img": "", "seed": "seven-bain", "cap": "Salle de bain", "class": ""}], "amenities": [{"icon": "◐", "title": "Ménage sur demande", "text": "Quotidien ou hebdomadaire, selon la durée de votre séjour."}, {"icon": "▤", "title": "Bureau & wifi fibre", "text": "Connexion stable dans chaque suite, coin bureau dédié."}, {"icon": "✦", "title": "Toit-terrasse", "text": "Piscine à débordement et vue sur la lagune, ouvert dès 6h."}, {"icon": "⚿", "title": "Accueil 24h/24", "text": "Arrivée tardive ou départ matinal, sans frais supplémentaire."}, {"icon": "⌘", "title": "Parking sécurisé", "text": "Une place réservée par suite, gardiennage permanent."}, {"icon": "♨", "title": "Blanchisserie", "text": "Collecte le matin, linge rendu le soir même."}, {"icon": "✂", "title": "Épicerie de courtoisie", "text": "Essentiels du petit-déjeuner disponibles à toute heure."}, {"icon": "➤", "title": "Navette aéroport", "text": "Transfert privé sur réservation, 35 minutes de l'aéroport FHB."}], "location": {"address": "Boulevard de la Corniche", "addressSub": "Cocody, Abidjan, Côte d'Ivoire", "phone": "+225 27 22 48 XX XX", "phoneSub": "Accueil disponible 24h/24", "email": "sejour@residence-seven.ci", "emailSub": "Réponse sous 24h ouvrées", "access": "10 min du Plateau", "accessSub": "35 min de l'aéroport Félix-Houphouët-Boigny"}, "booking": {"titleLine1": "Prêt pour votre", "titleEm": "séjour", "titleLine2": "?", "text": "Indiquez vos dates, nous confirmons la disponibilité et revenons vers vous sous peu — sans passer par un intermédiaire."}, "footer": {"desc": "Une résidence-hôtel sur la lagune Ébrié, à Cocody. Sept étages, un même souci du détail à chaque niveau.", "phone": "+225 27 22 48 XX XX", "email": "sejour@residence-seven.ci", "address": "Cocody, Abidjan"}};
+window.__FALLBACK__ = {"hero": {"eyebrow": "Résidence Seven — Cocody, Abidjan", "titleLine1": "Sept étages,", "titleEm": "une seule", "titleLine2": "adresse.", "subtitle": "Une résidence-hôtel discrète sur la lagune, pensée pour les séjours qui s'installent — une nuit, une semaine, une saison.", "stats": [{"label": "Ouvert", "value": "Toute l'année"}, {"label": "Suites", "value": "24 appartements"}, {"label": "Vue", "value": "Lagune Ébrié"}, {"label": "Arrivée", "value": "Dès 14h00"}]}, "philosophy": {"sectionTitle": "La maison", "sectionText": "Le chiffre sept donne son nom à la résidence — sept niveaux, sept lignes de conduite, une seule adresse à retenir.", "lead": "Résidence Seven n'est ni tout à fait un hôtel, ni tout à fait un appartement. C'est un <em>entre-deux</em> pensé pour les gens qui restent : le confort d'un chez-soi, la discrétion d'un service qui ne s'impose jamais.", "items": [{"code": "01", "title": "Séjours sans minimum imposé", "text": "Une nuit ou trois mois : le tarif s'ajuste, pas l'accueil."}, {"code": "02", "title": "Cuisine équipée dans chaque suite", "text": "Pour cuisiner un vrai repas, pas réchauffer un plat."}, {"code": "03", "title": "Personnel présent, jamais insistant", "text": "Un numéro direct, une réponse en quelques minutes, aucune sollicitation."}]}, "suites": [{"tag": "Studio", "name": "Le Comptoir", "meta": "28 m² · 1 personne", "desc": "Un espace compact et bien pensé, coin cuisine ouvert et bureau face à la lumière du matin.", "price": "55 000 F"}, {"tag": "Suite", "name": "La Lagune", "meta": "42 m² · 2 personnes", "desc": "Chambre séparée et balcon filant, vue directe sur l'eau, idéale pour les séjours d'une semaine.", "price": "85 000 F"}, {"tag": "Appartement", "name": "Le Sept", "meta": "68 m² · 4 personnes", "desc": "Deux chambres, salon traversant et terrasse privée au dernier étage. Notre adresse la plus demandée.", "price": "140 000 F"}], "gallery": [{"img": "", "seed": "seven-salon", "cap": "Le Sept — salon", "class": "wide tall"}, {"img": "", "seed": "seven-chambre", "cap": "La Lagune — chambre", "class": ""}, {"img": "", "seed": "seven-piscine", "cap": "Toit-terrasse", "class": ""}, {"img": "", "seed": "seven-cuisine", "cap": "Le Comptoir — cuisine", "class": "tall"}, {"img": "", "seed": "seven-accueil", "cap": "Réception", "class": "wide"}, {"img": "", "seed": "seven-vue", "cap": "Vue lagune", "class": ""}, {"img": "", "seed": "seven-bain", "cap": "Salle de bain", "class": ""}], "amenities": [{"icon": "◐", "title": "Ménage sur demande", "text": "Quotidien ou hebdomadaire, selon la durée de votre séjour."}, {"icon": "▤", "title": "Bureau & wifi fibre", "text": "Connexion stable dans chaque suite, coin bureau dédié."}, {"icon": "✦", "title": "Toit-terrasse", "text": "Piscine à débordement et vue sur la lagune, ouvert dès 6h."}, {"icon": "⚿", "title": "Accueil 24h/24", "text": "Arrivée tardive ou départ matinal, sans frais supplémentaire."}, {"icon": "⌘", "title": "Parking sécurisé", "text": "Une place réservée par suite, gardiennage permanent."}, {"icon": "♨", "title": "Blanchisserie", "text": "Collecte le matin, linge rendu le soir même."}, {"icon": "✂", "title": "Épicerie de courtoisie", "text": "Essentiels du petit-déjeuner disponibles à toute heure."}, {"icon": "➤", "title": "Navette aéroport", "text": "Transfert privé sur réservation, 35 minutes de l'aéroport FHB."}], "location": {"address": "Boulevard de la Corniche", "addressSub": "Cocody, Abidjan, Côte d'Ivoire", "phone": "+225 27 22 48 XX XX", "phoneSub": "Accueil disponible 24h/24", "email": "sejour@residence-seven.ci", "emailSub": "Réponse sous 24h ouvrées", "access": "10 min du Plateau", "accessSub": "35 min de l'aéroport Félix-Houphouët-Boigny"}, "booking": {"titleLine1": "Prêt pour votre", "titleEm": "séjour", "titleLine2": "?", "reservationUrl": "https://reservation-seven.pages.dev", "text": "Indiquez vos dates, nous confirmons la disponibilité et revenons vers vous sous peu — sans passer par un intermédiaire."}, "footer": {"desc": "Une résidence-hôtel sur la lagune Ébrié, à Cocody. Sept étages, un même souci du détail à chaque niveau.", "phone": "+225 27 22 48 XX XX", "email": "sejour@residence-seven.ci", "address": "Cocody, Abidjan"}};
 const API = '/api/content';
 let password = '';
 let state = null;
@@ -180,7 +187,7 @@ function buildForm(){
     panel('Suites', `<div id="suitesList"></div>
       <button type="button" class="btn-add" onclick="addItem('suites', {tag:'Suite', name:'Nouvelle suite', meta:'0 m² · 0 personne', desc:'Description.', price:'0 F'})">+ Ajouter une suite</button>
     `) +
-    panel('Galerie photo', `<p class="hint">Laissez "URL de l'image" vide pour utiliser une image de démonstration générée automatiquement.</p>
+    panel('Galerie photo', `<p class="hint">Cliquez sur "Choisir une photo" pour envoyer une image depuis votre ordinateur, ou collez une URL directement.</p>
       <div id="galleryList"></div>
       <button type="button" class="btn-add" onclick="addItem('gallery', {img:'', seed:'seven-'+Date.now(), cap:'Nouvelle photo', class:''})">+ Ajouter une photo</button>
     `) +
@@ -212,6 +219,7 @@ function buildForm(){
       </div>
       ${field('Titre — fin', 'booking.titleLine2')}
       ${field('Texte', 'booking.text', true)}
+      ${field('Lien de réservation (le bouton y redirigera, avec dates/suite/email en paramètres)', 'booking.reservationUrl')}
     `) +
     panel('Pied de page', `
       ${field('Description', 'footer.desc', true)}
@@ -247,9 +255,19 @@ function buildForm(){
     ${fieldRaw('Description', path + '.desc', item.desc, true)}`);
 
   renderList('galleryList', 'gallery', (item, path) => `
+    <div class="gal-preview-row">
+      <img class="gal-thumb" src="${item.img && item.img.trim() ? item.img : 'https://picsum.photos/seed/' + (item.seed || 'seven') + '/200/200'}" alt="">
+      <div class="gal-upload">
+        <label class="btn-upload">
+          Choisir une photo
+          <input type="file" accept="image/*" style="display:none" onchange="handleImageFile(this, '${path}.img')">
+        </label>
+        <span class="upload-hint">JPG/PNG, idéalement sous 500 Ko</span>
+      </div>
+    </div>
     <div class="row2">
       ${fieldRaw('Légende', path + '.cap', item.cap)}
-      ${fieldRaw("URL de l'image (optionnel)", path + '.img', item.img)}
+      ${fieldRaw("Ou coller une URL d'image directement", path + '.img', (item.img && item.img.startsWith('data:')) ? "(photo envoyée depuis l'ordinateur — retapez une URL ici pour la remplacer)" : item.img)}
     </div>`);
 
   renderList('amenitiesList', 'amenities', (item, path) => `
@@ -291,6 +309,34 @@ function removeItem(arrayPath, index){
   const arr = getPath(state, arrayPath);
   arr.splice(index, 1);
   buildForm();
+}
+
+const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024; // 1.5 Mo après encodage, marge de sécurité
+
+function handleImageFile(inputEl, path){
+  const file = inputEl.files && inputEl.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('saveStatus');
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result;
+    if(dataUrl.length > MAX_IMAGE_BYTES){
+      statusEl.textContent = "Image trop lourde — utilisez une photo plus légère (idéalement sous 500 Ko)";
+      statusEl.className = 'status err';
+      inputEl.value = '';
+      return;
+    }
+    setPath(state, path, dataUrl);
+    statusEl.textContent = 'Photo ajoutée — pensez à cliquer sur Enregistrer';
+    statusEl.className = 'status ok';
+    buildForm();
+  };
+  reader.onerror = () => {
+    statusEl.textContent = "Impossible de lire cette image, essayez un autre fichier";
+    statusEl.className = 'status err';
+  };
+  reader.readAsDataURL(file);
 }
 
 // ---------- Save ----------

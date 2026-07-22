@@ -71,7 +71,11 @@ header.top .actions{display:flex;gap:12px;align-items:center;}
 .gal-upload{display:flex;flex-direction:column;gap:4px;}
 .btn-upload{display:inline-block;background:var(--ink);color:var(--paper);font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;padding:9px 14px;cursor:pointer;width:fit-content;}
 .btn-upload:hover{opacity:0.85;}
+.btn-upload-multi{display:block;width:100%;text-align:center;background:var(--brass);color:var(--ink);padding:13px;margin-bottom:18px;font-size:0.75rem;}
 .upload-hint{font-size:0.72rem;opacity:0.5;}
+.color-row{display:flex;gap:10px;align-items:center;}
+.color-row input[type="color"]{width:44px;height:38px;padding:2px;cursor:pointer;flex-shrink:0;}
+.color-row .color-hex{flex:1;font-family:'Space Mono',monospace;text-transform:uppercase;}
 </style>
 </head>
 <body>
@@ -157,6 +161,27 @@ function onFieldInput(el){
   setPath(state, el.dataset.path, el.value);
 }
 
+function colorField(label, path){
+  const val = getPath(state, path) ?? '#000000';
+  return `<div class="field color-field">
+    <label>${label}</label>
+    <div class="color-row">
+      <input type="color" data-path="${path}" value="${escapeAttr(val)}" oninput="onColorInput(this)">
+      <input type="text" data-path="${path}" value="${escapeAttr(val)}" oninput="onColorTextInput(this)" class="color-hex">
+    </div>
+  </div>`;
+}
+function onColorInput(el){
+  setPath(state, el.dataset.path, el.value);
+  const sibling = el.parentElement.querySelector('.color-hex');
+  if(sibling) sibling.value = el.value;
+}
+function onColorTextInput(el){
+  setPath(state, el.dataset.path, el.value);
+  const sibling = el.parentElement.querySelector('input[type="color"]');
+  if(sibling && /^#[0-9a-fA-F]{6}$/.test(el.value)) sibling.value = el.value;
+}
+
 function panel(title, bodyHtml){
   return `<div class="panel"><div class="panel-head"><h2>${title}</h2></div><div class="panel-body">${bodyHtml}</div></div>`;
 }
@@ -188,8 +213,12 @@ function buildForm(){
       <button type="button" class="btn-add" onclick="addItem('suites', {tag:'Suite', name:'Nouvelle suite', meta:'0 m² · 0 personne', desc:'Description.', price:'0 F'})">+ Ajouter une suite</button>
     `) +
     panel('Galerie photo', `<p class="hint">Cliquez sur "Choisir une photo" pour envoyer une image depuis votre ordinateur, ou collez une URL directement.</p>
+      <label class="btn-upload btn-upload-multi">
+        + Ajouter plusieurs photos d'un coup
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleMultipleImageFiles(this)">
+      </label>
       <div id="galleryList"></div>
-      <button type="button" class="btn-add" onclick="addItem('gallery', {img:'', seed:'seven-'+Date.now(), cap:'Nouvelle photo', class:''})">+ Ajouter une photo</button>
+      <button type="button" class="btn-add" onclick="addItem('gallery', {img:'', seed:'seven-'+Date.now(), cap:'Nouvelle photo', class:''})">+ Ajouter une photo (URL)</button>
     `) +
     panel('Services de la maison', `<div id="amenitiesList"></div>
       <button type="button" class="btn-add" onclick="addItem('amenities', {icon:'✦', title:'Nouveau service', text:'Description.'})">+ Ajouter un service</button>
@@ -220,6 +249,36 @@ function buildForm(){
       ${field('Titre — fin', 'booking.titleLine2')}
       ${field('Texte', 'booking.text', true)}
       ${field('Lien de réservation (le bouton y redirigera, avec dates/suite/email en paramètres)', 'booking.reservationUrl')}
+    `) +
+    panel('Titres des sections', `
+      <p class="hint">Les titres et textes d'introduction qui apparaissent au-dessus de chaque section du site.</p>
+      <div class="row2">
+        ${field('Titre — Suites', 'sections.suitesTitle')}
+        ${field('Titre — Galerie', 'sections.galleryTitle')}
+      </div>
+      ${field('Texte — Suites', 'sections.suitesText')}
+      ${field('Texte — Galerie', 'sections.galleryText')}
+      <div class="row2">
+        ${field('Titre — Services', 'sections.servicesTitle')}
+        ${field('Titre — Adresse', 'sections.locationTitle')}
+      </div>
+      ${field('Texte — Services', 'sections.servicesText')}
+    `) +
+    panel('Couleurs du site', `
+      <p class="hint">Cliquez sur la pastille pour choisir une couleur, ou tapez un code directement (ex: #0F2A28).</p>
+      <div class="row2">
+        ${colorField('Couleur principale (fonds sombres, textes)', 'design.ink')}
+        ${colorField('Couleur secondaire (variante sombre)', 'design.inkSoft')}
+      </div>
+      <div class="row2">
+        ${colorField("Couleur d'accent (boutons, détails)", 'design.brass')}
+        ${colorField("Couleur d'accent claire", 'design.brassLight')}
+      </div>
+      <div class="row2">
+        ${colorField('Couleur de fond claire (sable)', 'design.sand')}
+        ${colorField('Couleur de fond principale (papier)', 'design.paper')}
+      </div>
+      ${colorField('Couleur du texte sur fond sombre', 'design.creamText')}
     `) +
     panel('SEO &amp; suivi (Analytics)', `
       <p class="hint">Ces champs améliorent le référencement Google et permettent de suivre vos visiteurs. Laissez vide ce que vous n'utilisez pas encore.</p>
@@ -321,6 +380,48 @@ function removeItem(arrayPath, index){
 }
 
 const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024; // 1.5 Mo après encodage, marge de sécurité
+
+function handleMultipleImageFiles(inputEl){
+  const files = Array.from(inputEl.files || []);
+  if(!files.length) return;
+  const statusEl = document.getElementById('saveStatus');
+  let processed = 0;
+  let rejected = 0;
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      if(dataUrl.length > MAX_IMAGE_BYTES){
+        rejected++;
+      } else {
+        state.gallery.push({
+          img: dataUrl,
+          seed: 'seven-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+          cap: file.name.replace(/\.[^.]+$/, ''),
+          class: ''
+        });
+      }
+      processed++;
+      if(processed === files.length){
+        if(rejected > 0){
+          statusEl.textContent = `${files.length - rejected} photo(s) ajoutée(s), ${rejected} ignorée(s) (trop lourde)`;
+          statusEl.className = 'status err';
+        } else {
+          statusEl.textContent = `${files.length} photo(s) ajoutée(s) — pensez à cliquer sur Enregistrer`;
+          statusEl.className = 'status ok';
+        }
+        buildForm();
+      }
+    };
+    reader.onerror = () => {
+      processed++;
+      rejected++;
+      if(processed === files.length) buildForm();
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 function handleImageFile(inputEl, path){
   const file = inputEl.files && inputEl.files[0];
